@@ -1,41 +1,55 @@
-import { galleryItems } from './gallery-items.js';
+import { galleryItems } from "./gallery-items.js";
 
 const gallery = document.querySelector(".gallery");
-const item = [];
+const items = [];
 
 galleryItems.forEach((element) => {
-    const galleryItem = document.createElement("div");
-    galleryItem.classList.add("gallery__item");
-    
-    const galleryLink = document.createElement("a");
-    galleryLink.classList.add("gallery__link");
+  const galleryItem = document.createElement("div");
+  galleryItem.classList.add("gallery__item");
 
-    galleryLink.href = element.original;
+  const galleryLink = document.createElement("a");
+  galleryLink.classList.add("gallery__link");
 
-    const galleryImage = document.createElement("img");
-    galleryImage.classList.add("gallery__image");
+  galleryLink.href = element.original;
 
-    galleryImage.src = element.preview;
-    galleryImage.setAttribute("data-source", element.original);
-    galleryImage.alt = element.description;
+  const galleryImg = document.createElement("img");
+  galleryImg.classList.add("gallery__image");
 
-    galleryItem.append(galleryLink);
-    galleryItem.append(galleryImage)
-    item.push(galleryItem);
-    
+  galleryImg.src = element.preview;
+  galleryImg.setAttribute("data-source", element.original);
+  galleryImg.alt = element.description;
+
+  galleryItem.append(galleryLink);
+  galleryLink.append(galleryImg);
+  items.push(galleryItem);
 });
 
-gallery.append(...item);
+gallery.append(...items);
 
 document.addEventListener("click", (el) => {
-    el.preventDefault();
-    if(el.target.nodeName !== "IMG") {
-        return;
+  el.preventDefault();
+  if (el.target.nodeName !== "IMG") {
+    return;
+  }
+  const imgSelected = el.target.getAttribute("data-source");
+
+  const template = basicLightbox.create(
+    `<img src="${imgSelected}" width="800" height="600">`,
+    {
+      onShow: () => {
+        document.addEventListener("keydown", closeModal);
+      },
+      onClose: () => {
+        document.removeEventListener("keydown", closeModal);
+      },
     }
-const imgSelected = el.target.getAttribute("data-source");
+  );
 
-const template = basicLightbox.create(
-    `<img src="${imgSelected}" width="800" height="600">`
-)
+  template.show();
 
+  function closeModal(el) {
+    if (el.key === "Escape") {
+        template.close();
+    }
+  }
 });
